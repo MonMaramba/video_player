@@ -1,5 +1,6 @@
 import React from "react";
+import Player from "./Player";
 
-const App = () => <div>Start here!</div>;
+const App = () => <Player />;
 
 export default App;
