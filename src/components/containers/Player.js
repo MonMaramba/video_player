@@ -26,13 +26,11 @@ const themeLight = {
   color: "#353535"
 };
 
-const Player = ({ match, history, location }) => {
+const Player = props => {
   // takes data from index.html and assigns to videos
   const videos = JSON.parse(document.querySelector('[name="videos"]').value);
 
-  // creating state in a functional component
   const [state, setState] = useState({
-    // setting initial values using useState
     videos: videos.playlist,
     activeVideo: videos.playlist[0],
     nightMode: true,
@@ -43,7 +41,7 @@ const Player = ({ match, history, location }) => {
   // every render has it's own useEffect
   useEffect(() => {
     // activeVideo is passed from parent App.js routing path :activeVideo
-    const videoId = match.params.activeVideo;
+    const videoId = props.match.params.activeVideo;
     // will route back to first video if activeVideo is null or not valid
     if (videoId !== undefined) {
       // this finds the videoId of what's in the videos array
@@ -55,34 +53,69 @@ const Player = ({ match, history, location }) => {
       setState(prev => ({
         ...prev,
         activeVideo: prev.videos[newActiveVideo],
-        autoplay: location.autoplay
+        autoplay: props.location.autoplay
       }));
     } else {
       // uses history to set the state to either the last played or the first one if there is no previous state
-      history.push({
+      props.history.push({
         pathname: `/${state.activeVideo.id}`,
         autoplay: false
       });
     }
     // the second array parameter to useEffect specifies which state properties to subscribe to. If they don't change, the component will not re-render
   }, [
-    history,
-    location.autoplay,
-    match.params.activeVideo,
+    props.history,
+    props.location.autoplay,
+    props.match.params.activeVideo,
     state.activeVideo.id,
     state.videos
   ]);
 
-  const nightModeCallBack = () => {};
+  const nightModeCallback = () => {
+    setState({ ...state, nightMode: !state.nightMode });
+  };
 
-  const endCallback = () => {};
+  const endCallback = () => {
+    const videoId = props.match.params.activeVideo;
+    const currentVideoIndex = state.videos.findIndex(
+      video => video.id === videoId
+    );
 
-  const progressCallback = () => {};
+    const nextVideo =
+      currentVideoIndex === state.videos.length - 1 ? 0 : currentVideoIndex + 1;
+
+    props.history.push({
+      pathname: `${state.videos[nextVideo].id}`,
+      autoplay: true
+    });
+  };
+
+  const progressCallback = e => {
+    if (e.playedSeconds > 10 && e.playedSeconds < 11) {
+      const videos = [...state.videos];
+      const playedVideo = videos.find(
+        video => video.id === state.activeVideo.id
+      );
+      playedVideo.played = true;
+
+      setState(prevState => ({ ...prevState, videos }));
+
+      // setState({
+      //   ...state,
+      //   videos: state.videos.map( element => {
+      //     return element.id === state.activeVideo.id
+      //     ? { ...element, played: true }
+      //     : element;
+      //   })
+      // });
+    }
+  };
 
   return (
     <ThemeProvider theme={state.nightMode ? theme : themeLight}>
-      {state.video !== null ? (
+      {state.videos !== null ? (
         <StyledPlayer>
+          {console.log(state)}
           <Video
             active={state.activeVideo}
             autoplay={state.autoplay}
@@ -92,13 +125,12 @@ const Player = ({ match, history, location }) => {
           <Playlist
             videos={state.videos}
             active={state.activeVideo}
-            nightModeCallback={nightModeCallBack}
+            nightModeCallback={nightModeCallback}
             nightMode={state.nightMode}
           />
         </StyledPlayer>
       ) : null}
     </ThemeProvider>
-    // enclosing the components in a fragment <React.Fragment> shortened to <> and closed with </>
   );
 };
 
