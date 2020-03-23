@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 // for uniform themes across the whole app passing it as a prop
 import { ThemeProvider } from "styled-components";
 import StyledPlayer from "../styles/StyledPlayer";
@@ -27,12 +27,40 @@ const themeLight = {
 };
 
 const Player = props => {
+  const videos = JSON.parse(document.querySelector('[name="videos"]').value);
+
+  const [state, setState] = useState({
+    videos: videos.playlist,
+    activeVideo: videos.playlist[0],
+    nightMode: true,
+    playlistId: videos.playlistId,
+    autoplay: false
+  });
+
+  const nightModeCallBack = () => {};
+
+  const endCallback = () => {};
+
+  const progressCallback = () => {};
+
   return (
     <ThemeProvider theme={state.nightMode ? theme : themeLight}>
-      <StyledPlayer>
-        <Video />
-        <Playlist />
-      </StyledPlayer>
+      {state.video !== null ? (
+        <StyledPlayer>
+          <Video
+            active={state.activeVideo}
+            autoplay={state.autoplay}
+            endCallback={endCallback}
+            progressCallback={progressCallback}
+          />
+          <Playlist
+            videos={state.videos}
+            active={state.activeVideo}
+            nightModeCallback={nightModeCallBack}
+            nightMode={state.nightMode}
+          />
+        </StyledPlayer>
+      ) : null}
     </ThemeProvider>
     // enclosing the components in a fragment <React.Fragment> shortened to <> and closed with </>
   );

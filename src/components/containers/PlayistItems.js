@@ -4,10 +4,16 @@ import PlaylistItem from "../PlaylistIem";
 
 import StyledPlaylistItems from "../styles/StyledPlaylistItems";
 
-const Playlistitems = props => (
+const Playlistitems = ({ videos, active }) => (
   <StyledPlaylistItems>
-    {" "}
-    <PlaylistItem />
+    {videos.map(video => (
+      <PlaylistItem
+        key={video.id}
+        video={video}
+        active={video.id === active.id ? true : false}
+        played={video.played}
+      />
+    ))}
   </StyledPlaylistItems>
 );
 

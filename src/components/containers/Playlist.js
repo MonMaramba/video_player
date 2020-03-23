@@ -6,11 +6,11 @@ import NightMode from "../NightMode";
 
 import StyledPlaylist from "../styles/StyledPlaylist";
 
-const Playlist = props => (
+const Playlist = ({ videos, active, nightModeCallback, nightMode }) => (
   <StyledPlaylist>
-    <NightMode />
-    <PlaylistHeader />
-    <PlaylistItems />
+    <NightMode nightModeCallback={nightModeCallback} nightmode={nightMode} />
+    <PlaylistHeader active={active} to={videos.length} />
+    <PlaylistItems videos={videos} active={active} />
   </StyledPlaylist>
 );
 
