@@ -30,13 +30,22 @@ const Player = props => {
   // takes data from index.html and assigns to videos
   const videos = JSON.parse(document.querySelector('[name="videos"]').value);
 
+  // will check for played state in local storage on initial play
+  const savedState = JSON.parse(localStorage.getItem(`${videos.playlistId}`));
+
   const [state, setState] = useState({
-    videos: videos.playlist,
-    activeVideo: videos.playlist[0],
-    nightMode: true,
-    playlistId: videos.playlistId,
+    videos: savedState ? savedState.videos : videos.playlist,
+    activeVideo: savedState ? savedState.activeVideo : videos.playlist[0],
+    nightMode: savedState ? savedState.nightMode : true,
+    playlistId: savedState ? savedState.playlistId : videos.playlistId,
     autoplay: false
   });
+
+  // for persistence
+  useEffect(() => {
+    localStorage.setItem(`${state.playlistId}`, JSON.stringify({ ...state }));
+  }, [state]);
+
   // useEffect runs after every render including the first
   // every render has it's own useEffect
   useEffect(() => {
@@ -115,7 +124,6 @@ const Player = props => {
     <ThemeProvider theme={state.nightMode ? theme : themeLight}>
       {state.videos !== null ? (
         <StyledPlayer>
-          {console.log(state)}
           <Video
             active={state.activeVideo}
             autoplay={state.autoplay}
